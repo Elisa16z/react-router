@@ -1,4 +1,4 @@
-import { Link, Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes, useParams, Outlet, useLocation } from 'react-router-dom'
 
 function Router() {
 
@@ -6,18 +6,52 @@ function Router() {
         return (
             <div className='container'>
                 <h1>Home</h1>
-                <p>Welcome to the home page!</p>
+                Welcome to the home page!
             </div>
         )
     }
     const SearchPage = () => {
+        const tacos = [
+            'Cochinita',
+            'Chili',
+            'Carnita'
+        ]
         return (
             <div className='container'>
                 <h1>Search Page</h1>
-                <p>Welcome to the search page!</p>
+                <ul>
+                {tacos.map(taco => (
+                   <li key={taco}><Link to={`/tacos/${taco}`}><h4>{taco}</h4></Link></li> 
+                ))}
+                </ul>
             </div>
         )
     }
+  
+    const Tacos = () => {
+        const { taco } = useParams()
+        const location = useLocation() // Hook para obtener la ruta actual
+        return (
+            <div className='container-tacos'>
+                <h1>Tacos</h1>
+                <div className="taco"><h2>{taco}</h2></div>
+               
+               {/* Mostrar el enlace solo si no estamos en /details */}
+               {!location.pathname.includes('/details') && (
+                    <Link to={`/tacos/${taco}/details`}><p>Ir a los detalles</p></Link>
+                )}
+                <Outlet />
+            </div>
+        )
+    }
+
+    const TacoDetails = () => {
+        const { taco } = useParams()
+        return (
+                <h2>Taco Detail {taco}</h2>
+        )
+    }
+
     return (
       <>
        <div>
@@ -33,7 +67,10 @@ function Router() {
         <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/search-page' element={<SearchPage />} />
-
+            <Route path='/tacos/:taco' element={<Tacos />}>
+              <Route path='details' element={<TacoDetails />} />
+            </Route>
+            <Route path='*' element={<h1>Not Found T</h1>}></Route>
         </Routes>
        </div>
       </>
